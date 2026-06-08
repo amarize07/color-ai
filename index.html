@@ -55,7 +55,6 @@
     }
 
     async function loadModel() {
-        // استخدم المسار الصحيح للمجلد الذي يحتوي model.json
         const modelUrl = new URL('model.json', window.location).href;
         const status = document.getElementById('statusMsg');
         try {
@@ -64,8 +63,8 @@
             status.innerHTML = '✅ النموذج جاهز. اختر لوناً واضغط توليد.';
             status.style.background = '#cfe8cf';
         } catch (err) {
-            console.error(err);
-            status.innerHTML = '❌ فشل تحميل النموذج. تأكد من وجود مجلد "" مع model.json وملفات bin.';
+            console.error('Model loading error:', err);
+            status.innerHTML = '❌ فشل تحميل النموذج. تأكد من وجود model.json وملفات bin.';
             status.style.background = '#f5c6cb';
         }
     }
@@ -80,7 +79,7 @@
         const rgbInput = hexToRgb(hex);
         const inputTensor = tf.tensor2d([rgbInput], [1, 3]);
         const outputTensor = model.predict(inputTensor);
-        const outputData = await outputTensor.data(); // length 9
+        const outputData = await outputTensor.data();
         inputTensor.dispose();
         outputTensor.dispose();
 
@@ -94,12 +93,10 @@
     function displayPalette(inputHex, predictedRgb) {
         const container = document.getElementById('paletteContainer');
         container.innerHTML = '';
-        // إضافة لون المدخل
         const inputCard = document.createElement('div');
         inputCard.className = 'color-card';
         inputCard.innerHTML = `<div class="swatch" style="background-color: ${inputHex};"></div><div class="hex-label">🎨 مدخل<br>${inputHex}</div>`;
         container.appendChild(inputCard);
-        // إضافة الألوان المتوقعة
         for (let i=0; i<predictedRgb.length; i++) {
             const hex = rgbToHex(predictedRgb[i]);
             const card = document.createElement('div');
