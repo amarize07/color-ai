@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>PaletteNet · نموذج TFLite مولّد اللوحات</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
   <!-- TensorFlow.js و مكوّن TFLite -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.3/dist/tf-tflite.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.6/dist/tf-tflite.min.js"></script>
   <style>
     *{ box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body{ background: linear-gradient(145deg, #eef2f7 0%, #d4dfed 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; padding: 1rem; }
@@ -65,11 +66,16 @@
     const status = document.getElementById('statusMsg');
     const modelPath = './palette_model_quantized.tflite';   // المسار النسبي إلى ملف .tflite
     try {
-      // استخدام TFLite من مكتبة tf-tflite
-      if (!tf.tflite || !tf.tflite.loadTFLiteModel) {
+      // استخدام TFLite من مكتبة tf-tflite (تُصدَّر كـ window.tflite عند التحميل عبر CDN)
+      const tfliteLib = window.tflite;
+      if (!tfliteLib || !tfliteLib.loadTFLiteModel) {
         throw new Error("مكتبة tf-tflite لم تحمل بشكل صحيح. تأكد من الاتصال بالإنترنت ووجود السكربتات.");
       }
-      tfliteModel = await tf.tflite.loadTFLiteModel(modelPath);
+      // ضبط مسار ملفات WASM
+      if (tfliteLib.setWasmPath) {
+        tfliteLib.setWasmPath('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.6/dist/');
+      }
+      tfliteModel = await tfliteLib.loadTFLiteModel(modelPath);
       modelReady = true;
       status.innerHTML = '✅ النموذج (.tflite) جاهز تماماً! اختر لوناً وانقر توليد.';
       status.style.background = "#d4efdf";
