@@ -1,0 +1,3 @@
+*.tflite binary
+*.bin binary
+*.model binary
