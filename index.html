@@ -56,7 +56,7 @@
 
     async function loadModel() {
         // استخدم المسار الصحيح للمجلد الذي يحتوي model.json
-        const modelUrl = './model.json';
+        const modelUrl = new URL('model.json', window.location).href;
         const status = document.getElementById('statusMsg');
         try {
             model = await tf.loadLayersModel(modelUrl);
